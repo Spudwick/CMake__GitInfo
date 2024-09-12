@@ -6,7 +6,7 @@ char commit_hash[] = GIT_COMMIT_HASH;
 
 int main( int argc, char *argv[] )
 {
-    printf("Hello world! ");
+    printf("Commit Hash: %s\n", commit_hash);
 
     return 0;
 }
