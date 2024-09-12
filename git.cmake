@@ -53,6 +53,15 @@ function(_t_git_create_stage1_script SCRIPT_PATH)
         "   OUTPUT_STRIP_TRAILING_WHITESPACE\n"
         ")\n"
     )
+    # Get commit timestamp (Unix epoch in UTC)
+    file(APPEND ${SCRIPT_PATH}
+        "execute_process(\n"
+        "   COMMAND git show -s --format=%ct\n"
+        "   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}\n"
+        "   OUTPUT_VARIABLE GIT_COMMIT_TIMESTAMP\n"
+        "   OUTPUT_STRIP_TRAILING_WHITESPACE\n"
+        ")\n"
+    )
 
     # Add info to cache file
     file(APPEND ${SCRIPT_PATH}
@@ -61,6 +70,9 @@ function(_t_git_create_stage1_script SCRIPT_PATH)
         ")\n"
         "file(APPEND ${BASE_DIR}/git-info.stage1\n"
         "   \"\${GIT_COMMIT_HASH}\\n\"\n"
+        ")\n"
+        "file(APPEND ${BASE_DIR}/git-info.stage1\n"
+        "   \"\${GIT_COMMIT_TIMESTAMP}\\n\"\n"
         ")\n"
     )
 
@@ -85,6 +97,9 @@ function(_t_git_create_stage2_script SCRIPT_PATH HDR_PATH)
     )
     file(APPEND ${SCRIPT_PATH}
         "list(GET GIT_INFO 1 GIT_COMMIT_HASH)\n"
+    )
+    file(APPEND ${SCRIPT_PATH}
+        "list(GET GIT_INFO 2 GIT_COMMIT_TIMESTAMP)\n"
     )
 
     file(APPEND ${SCRIPT_PATH}
@@ -113,6 +128,12 @@ function(_t_git_create_stage2_script SCRIPT_PATH HDR_PATH)
     file(APPEND ${SCRIPT_PATH}
         "file(APPEND ${HDR_PATH}\n"
         "   \"#define GIT_COMMIT_HASH \\\"\${GIT_COMMIT_HASH}\\\"\\n\"\n"
+        "   \"\\n\"\n"
+        ")\n"
+    )
+    file(APPEND ${SCRIPT_PATH}
+        "file(APPEND ${HDR_PATH}\n"
+        "   \"#define GIT_COMMIT_TIMESTAMP \${GIT_COMMIT_TIMESTAMP}\\n\"\n"
         "   \"\\n\"\n"
         ")\n"
     )
