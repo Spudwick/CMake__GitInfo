@@ -35,7 +35,16 @@ function(_t_git_create_stage1_script SCRIPT_PATH)
         "\n"
     )
 
-    # Get Git commit hash with dirty tag
+    # Get current Git branch
+    file(APPEND ${SCRIPT_PATH}
+        "execute_process(\n"
+        "   COMMAND git branch --show-current\n"
+        "   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}\n"
+        "   OUTPUT_VARIABLE GIT_BRANCH\n"
+        "   OUTPUT_STRIP_TRAILING_WHITESPACE\n"
+        ")\n"
+    )
+    # Get full Git commit hash with dirty tag
     file(APPEND ${SCRIPT_PATH}
         "execute_process(\n"
         "   COMMAND git describe --always --dirty --abbrev=0\n"
@@ -44,12 +53,17 @@ function(_t_git_create_stage1_script SCRIPT_PATH)
         "   OUTPUT_STRIP_TRAILING_WHITESPACE\n"
         ")\n"
     )
-    # Create hash text file
+
+    # Add info to cache file
     file(APPEND ${SCRIPT_PATH}
-        "file(WRITE ${BASE_DIR}/git-hash.stage1\n"
-        "   \${GIT_COMMIT_HASH}\n"
+        "file(WRITE ${BASE_DIR}/git-info.stage1\n"
+        "   \"\${GIT_BRANCH}\\n\"\n"
+        ")\n"
+        "file(APPEND ${BASE_DIR}/git-info.stage1\n"
+        "   \"\${GIT_COMMIT_HASH}\\n\"\n"
         ")\n"
     )
+
 endfunction()
 
 function(_t_git_create_stage2_script SCRIPT_PATH HDR_PATH)
@@ -62,9 +76,24 @@ function(_t_git_create_stage2_script SCRIPT_PATH HDR_PATH)
     )
 
     file(APPEND ${SCRIPT_PATH}
-        "file(READ ${BASE_DIR}/git-hash.stage2\n"
-        "   GIT_COMMIT_HASH\n"
+        "file(STRINGS ${BASE_DIR}/git-info.stage2\n"
+        "   GIT_INFO\n"
         ")\n"
+    )
+    file(APPEND ${SCRIPT_PATH}
+        "list(GET GIT_INFO 0 GIT_BRANCH)\n"
+    )
+    file(APPEND ${SCRIPT_PATH}
+        "list(GET GIT_INFO 1 GIT_COMMIT_HASH)\n"
+    )
+
+    file(APPEND ${SCRIPT_PATH}
+        "string(FIND \${GIT_COMMIT_HASH} \"-dirty\" GIT_DIRTY)\n"
+        "if(GIT_DIRTY EQUAL -1)\n"
+        "   set(GIT_DIRTY 0)\n"
+        "else()\n"
+        "   set(GIT_DIRTY 1)\n" 
+        "endif()\n"
     )
 
     file(APPEND ${SCRIPT_PATH}
@@ -77,7 +106,19 @@ function(_t_git_create_stage2_script SCRIPT_PATH HDR_PATH)
 
     file(APPEND ${SCRIPT_PATH}
         "file(APPEND ${HDR_PATH}\n"
+        "   \"#define GIT_BRANCH \\\"\${GIT_BRANCH}\\\"\\n\"\n"
+        "   \"\\n\"\n"
+        ")\n"
+    )
+    file(APPEND ${SCRIPT_PATH}
+        "file(APPEND ${HDR_PATH}\n"
         "   \"#define GIT_COMMIT_HASH \\\"\${GIT_COMMIT_HASH}\\\"\\n\"\n"
+        "   \"\\n\"\n"
+        ")\n"
+    )
+    file(APPEND ${SCRIPT_PATH}
+        "file(APPEND ${HDR_PATH}\n"
+        "   \"#define GIT_DIRTY \${GIT_DIRTY}\\n\"\n"
         "   \"\\n\"\n"
         ")\n"
     )
@@ -120,7 +161,7 @@ function(t_git_add_header TARGET HDR_INC_PATH)
     _t_git_create_stage2_script("${SCRIPT_DIR}/stage2.cmake" "${HDR_PATH}")
 
     add_custom_command(
-        OUTPUT "${SCRIPT_DIR}/git-hash.stage1"
+        OUTPUT "${SCRIPT_DIR}/git-info.stage1"
         COMMAND ${CMAKE_COMMAND} "-P" "${SCRIPT_DIR}/stage1.cmake"
         COMMENT "Getting Git info"
         DEPENDS
@@ -128,15 +169,15 @@ function(t_git_add_header TARGET HDR_INC_PATH)
     )
 
     add_custom_command(
-        OUTPUT "${SCRIPT_DIR}/git-hash.stage2"
-        DEPENDS "${SCRIPT_DIR}/git-hash.stage1"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${SCRIPT_DIR}/git-hash.stage1" "${SCRIPT_DIR}/git-hash.stage2"
+        OUTPUT "${SCRIPT_DIR}/git-info.stage2"
+        DEPENDS "${SCRIPT_DIR}/git-info.stage1"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${SCRIPT_DIR}/git-info.stage1" "${SCRIPT_DIR}/git-info.stage2"
         COMMENT ""
     )
 
     add_custom_command(
         OUTPUT ${HDR_PATH}
-        DEPENDS "${SCRIPT_DIR}/git-hash.stage2"
+        DEPENDS "${SCRIPT_DIR}/git-info.stage2"
         COMMAND ${CMAKE_COMMAND} "-P" "${SCRIPT_DIR}/stage2.cmake"
     )
 
