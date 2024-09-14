@@ -1,3 +1,8 @@
+/*===================================================
+ * CMake auto-configured Git information header
+ * Author: https://github.com/Spudwick
+ *=================================================*/
+
 #ifndef @INCLUDE_GAURD_DEF@
 #define @INCLUDE_GAURD_DEF@
 
