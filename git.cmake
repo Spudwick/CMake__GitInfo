@@ -6,6 +6,8 @@ include(CMakeParseArguments)
 # PRIVATE MEMBERS
 #=========================================================
 
+set(_T_GIT_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
+
 add_custom_command(
     OUTPUT _t_git_always_rebuild
     COMMAND cmake -E echo
@@ -78,8 +80,10 @@ function(_t_git_create_stage1_script SCRIPT_PATH)
 
 endfunction()
 
-function(_t_git_create_stage2_script SCRIPT_PATH HDR_PATH)
+function(_t_git_create_stage2_script SCRIPT_PATH INC_DIR HDR_INC_PATH)
     get_filename_component(BASE_DIR ${SCRIPT_PATH} DIRECTORY)
+
+    set(HDR_PATH "${INC_DIR}/${HDR_INC_PATH}")
 
     _t_git_write_script_banner(${SCRIPT_PATH})
     file(APPEND ${SCRIPT_PATH}
@@ -105,50 +109,23 @@ function(_t_git_create_stage2_script SCRIPT_PATH HDR_PATH)
     file(APPEND ${SCRIPT_PATH}
         "string(FIND \${GIT_COMMIT_HASH} \"-dirty\" GIT_DIRTY)\n"
         "if(GIT_DIRTY EQUAL -1)\n"
-        "   set(GIT_DIRTY 0)\n"
+        "   unset(GIT_DIRTY)\n"
         "else()\n"
-        "   set(GIT_DIRTY 1)\n" 
+        "   set(GIT_DIRTY 1)\n"
         "endif()\n"
     )
 
-    file(APPEND ${SCRIPT_PATH}
-        "file(WRITE ${HDR_PATH}\n"
-        "   \"#ifndef CMAKE_GIT_HEADER_H_INCLUDED\\n\"\n"
-        "   \"#define CMAKE_GIT_HEADER_H_INCLUDED\\n\"\n"
-        "   \"\\n\"\n"
-        ")\n"
-    )
+    set(INCLUDE_GAURD_DEF ${HDR_INC_PATH})
+    string(REPLACE "/" "_" INCLUDE_GAURD_DEF ${INCLUDE_GAURD_DEF})
+    string(REPLACE "\\" "_" INCLUDE_GAURD_DEF ${INCLUDE_GAURD_DEF})
+    string(REPLACE "." "_" INCLUDE_GAURD_DEF ${INCLUDE_GAURD_DEF})
+    string(TOUPPER ${INCLUDE_GAURD_DEF} INCLUDE_GAURD_DEF)
+    string(PREPEND INCLUDE_GAURD_DEF "GIT_")
+    string(APPEND INCLUDE_GAURD_DEF "_INCLUDED")
 
     file(APPEND ${SCRIPT_PATH}
-        "file(APPEND ${HDR_PATH}\n"
-        "   \"#define GIT_BRANCH \\\"\${GIT_BRANCH}\\\"\\n\"\n"
-        "   \"\\n\"\n"
-        ")\n"
-    )
-    file(APPEND ${SCRIPT_PATH}
-        "file(APPEND ${HDR_PATH}\n"
-        "   \"#define GIT_COMMIT_HASH \\\"\${GIT_COMMIT_HASH}\\\"\\n\"\n"
-        "   \"\\n\"\n"
-        ")\n"
-    )
-    file(APPEND ${SCRIPT_PATH}
-        "file(APPEND ${HDR_PATH}\n"
-        "   \"#define GIT_COMMIT_TIMESTAMP \${GIT_COMMIT_TIMESTAMP}\\n\"\n"
-        "   \"\\n\"\n"
-        ")\n"
-    )
-    file(APPEND ${SCRIPT_PATH}
-        "file(APPEND ${HDR_PATH}\n"
-        "   \"#define GIT_DIRTY \${GIT_DIRTY}\\n\"\n"
-        "   \"\\n\"\n"
-        ")\n"
-    )
-
-    file(APPEND ${SCRIPT_PATH}
-        "file(APPEND ${HDR_PATH}\n"
-        "   \"#endif // CMAKE_GIT_HEADER_H_INCLUDED ...\"\n"
-        "   \"\\n\"\n"
-        ")\n"
+        "set(INCLUDE_GAURD_DEF \"${INCLUDE_GAURD_DEF}\")\n"
+        "configure_file(\"${_T_GIT_ROOT_DIR}/git.h.in\" \"${HDR_PATH}\")\n"
     )
 endfunction()
 
@@ -179,7 +156,7 @@ function(t_git_add_header TARGET HDR_INC_PATH)
 
     _t_git_create_stage1_script("${SCRIPT_DIR}/stage1.cmake")
 
-    _t_git_create_stage2_script("${SCRIPT_DIR}/stage2.cmake" "${HDR_PATH}")
+    _t_git_create_stage2_script("${SCRIPT_DIR}/stage2.cmake" "${INC_DIR}" "${HDR_INC_PATH}")
 
     add_custom_command(
         OUTPUT "${SCRIPT_DIR}/git-info.stage1"
