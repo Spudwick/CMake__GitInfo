@@ -13,4 +13,4 @@ add_executable(example
     "./main.c"
 )
 
-t_git_add_header(example "cmake/git.h")
+t_git_target_add_header(example "cmake/git.h")

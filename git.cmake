@@ -54,7 +54,7 @@ endfunction()
 # PUBLIC MEMBERS
 #=========================================================
 
-function(t_git_add_header TARGET HDR_INC_PATH)
+function(t_git_target_add_header TARGET HDR_INC_PATH)
     set(OPTIONS)
     set(ONE_VAL_ARGS WORKDIR)
     set(MULIT_VAL_ARGS)
