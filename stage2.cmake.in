@@ -1,0 +1,26 @@
+# Auto-configured cmake script
+#
+# Git Header Generator
+# Author: https://github.com/Spudwick
+#
+# Stage 2
+
+# Read in Git information
+file(STRINGS @INPUT_FILE@
+   GIT_INFO
+)
+list(GET GIT_INFO 0 GIT_BRANCH)
+list(GET GIT_INFO 1 GIT_COMMIT_HASH)
+list(GET GIT_INFO 2 GIT_COMMIT_TIMESTAMP)
+
+# Extract Dirty state
+string(FIND ${GIT_COMMIT_HASH} "-dirty" GIT_DIRTY)
+if(GIT_DIRTY EQUAL -1)
+   unset(GIT_DIRTY)
+else()
+   set(GIT_DIRTY 1)
+endif()
+
+# Configure header template file
+set(INCLUDE_GAURD_DEF "@INCLUDE_GAURD_DEF@")
+configure_file("@GIT_HDR_TEMPLATE_PATH@" "@OUTPUT_PATH@")

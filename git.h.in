@@ -1,0 +1,17 @@
+/*===================================================
+ * CMake auto-configured Git information header
+ * Author: https://github.com/Spudwick
+ *=================================================*/
+
+#ifndef @INCLUDE_GAURD_DEF@
+#define @INCLUDE_GAURD_DEF@
+
+#cmakedefine GIT_BRANCH "@GIT_BRANCH@"
+
+#cmakedefine GIT_COMMIT_HASH "@GIT_COMMIT_HASH@"
+
+#cmakedefine GIT_COMMIT_TIMESTAMP @GIT_COMMIT_TIMESTAMP@
+
+#cmakedefine GIT_DIRTY
+
+#endif  /* #ifndef @INCLUDE_GAURD_DEF@ ... */
