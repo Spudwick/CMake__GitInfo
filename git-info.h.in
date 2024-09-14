@@ -1,0 +1,20 @@
+/*=========================================================
+ * Copyright (C) 2024 Thomas Oliver - All Rights Reserved
+ * You may use, distribute and modify this code under the
+ * terms of the GPL license distributed with this code.
+ *=======================================================*/
+
+/* Auto-configured CMake header - don't modify */
+
+#ifndef @INCLUDE_GAURD_DEF@
+#define @INCLUDE_GAURD_DEF@
+
+#cmakedefine GIT_BRANCH "@GIT_BRANCH@"
+
+#cmakedefine GIT_COMMIT_HASH "@GIT_COMMIT_HASH@"
+
+#cmakedefine GIT_COMMIT_TIMESTAMP @GIT_COMMIT_TIMESTAMP@
+
+#cmakedefine GIT_DIRTY
+
+#endif  /* #ifndef @INCLUDE_GAURD_DEF@ ... */

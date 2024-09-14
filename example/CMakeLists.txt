@@ -7,7 +7,7 @@ project(example
         LANGUAGES C
 )
 
-include(git)
+include(git-info)
 
 add_executable(example
     "./main.c"

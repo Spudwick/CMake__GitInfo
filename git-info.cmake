@@ -1,3 +1,9 @@
+#=========================================================
+# Copyright (C) 2024 Thomas Oliver - All Rights Reserved
+# You may use, distribute and modify this code under the
+# terms of the GPL license distributed with this code.
+#=========================================================
+
 include_guard(GLOBAL)
 
 include(CMakeParseArguments)
@@ -7,6 +13,10 @@ include(CMakeParseArguments)
 #=========================================================
 
 set(_T_GIT_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
+
+set(_T_GIT_STAGE1_SCRIPT_TEMPLATE_PATH "${_T_GIT_ROOT_DIR}/stage1.cmake.in")
+set(_T_GIT_STAGE2_SCRIPT_TEMPLATE_PATH "${_T_GIT_ROOT_DIR}/stage2.cmake.in")
+set(_T_GIT_HDR_TEMPLATE_PATH "${_T_GIT_ROOT_DIR}/git-info.h.in")
 
 add_custom_command(
     OUTPUT _t_git_always_rebuild
@@ -24,7 +34,7 @@ function(_t_git_create_stage1_script SCRIPT_PATH)
     set(OUTPUT_PATH "${BASE_DIR}/git-info.stage1")
     set(WORKSPACE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
     
-    configure_file("${_T_GIT_ROOT_DIR}/stage1.cmake.in" "${SCRIPT_PATH}"
+    configure_file(${_T_GIT_STAGE1_SCRIPT_TEMPLATE_PATH} ${SCRIPT_PATH}
         @ONLY
     )
 endfunction()
@@ -33,7 +43,7 @@ function(_t_git_create_stage2_script SCRIPT_PATH INC_DIR HDR_INC_PATH)
     get_filename_component(BASE_DIR ${SCRIPT_PATH} DIRECTORY)
 
     set(INPUT_FILE "${BASE_DIR}/git-info.stage2")
-    set(GIT_HDR_TEMPLATE_PATH "${_T_GIT_ROOT_DIR}/git.h.in")
+    set(GIT_HDR_TEMPLATE_PATH ${_T_GIT_HDR_TEMPLATE_PATH})
     set(OUTPUT_PATH "${INC_DIR}/${HDR_INC_PATH}")
 
     set(INCLUDE_GAURD_DEF ${HDR_INC_PATH})
@@ -44,7 +54,7 @@ function(_t_git_create_stage2_script SCRIPT_PATH INC_DIR HDR_INC_PATH)
     string(PREPEND INCLUDE_GAURD_DEF "GIT_")
     string(APPEND INCLUDE_GAURD_DEF "_INCLUDED")
 
-    configure_file("${_T_GIT_ROOT_DIR}/stage2.cmake.in" "${SCRIPT_PATH}"
+    configure_file(${_T_GIT_STAGE2_SCRIPT_TEMPLATE_PATH} ${SCRIPT_PATH}
         @ONLY
     )
 endfunction()
