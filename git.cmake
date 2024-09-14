@@ -97,6 +97,7 @@ function(t_git_target_add_header TARGET HDR_INC_PATH)
         OUTPUT ${HDR_PATH}
         DEPENDS "${SCRIPT_DIR}/git-info.stage2"
         COMMAND ${CMAKE_COMMAND} "-P" "${SCRIPT_DIR}/stage2.cmake"
+        COMMENT "Generating ${HDR_INC_PATH}"
     )
 
     target_include_directories(${TARGET}
