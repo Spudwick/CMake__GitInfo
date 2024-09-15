@@ -58,4 +58,4 @@ The Git information is provided in the header through several `#defines`.
 
 ## License
 
-This code is made available under the GPL 3.0 licence distributed with the repository (See [LICENSE](LICENSE)).
+This code is made available under the  [LICENSE](LICENSE) distributed with the repository.
