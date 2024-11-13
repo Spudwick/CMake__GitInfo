@@ -112,13 +112,19 @@ function(t_git_target_add_header TARGET HDR_INC_PATH)
         COMMENT "Generating ${HDR_INC_PATH}"
     )
 
-    target_include_directories(${TARGET}
-        PRIVATE ${INC_DIR}
+    set(TARGET_LIB _${TARGET}_gitinfo)
+
+    add_library(${TARGET_LIB} INTERFACE)
+
+    target_sources(${TARGET_LIB} INTERFACE
+        ${HDR_PATH}
     )
 
-    target_sources(${TARGET}
-        PRIVATE ${HDR_PATH}
+    target_include_directories(${TARGET_LIB} INTERFACE
+        ${INC_DIR}
     )
+
+    add_library(${TARGET}::gitinfo ALIAS ${TARGET_LIB})
 
     list(POP_BACK CMAKE_MESSAGE_INDENT)
     message(CHECK_PASS "success")
