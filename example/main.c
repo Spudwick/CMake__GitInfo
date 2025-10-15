@@ -16,7 +16,7 @@ int main( int argc, char *argv[] )
     strftime(buff, 20, "%d-%m-%Y %H:%M:%S", localtime(&commit_tmstmp));
     printf("Commit Time : %s\n", buff);
 
-#ifdef GIT_DIRTY
+#if GIT_DIRTY
         printf("Workspace DIRTY!\n");
 #else
         printf("Workspace clean.\n");

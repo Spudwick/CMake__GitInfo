@@ -16,14 +16,7 @@ list(GET GIT_INFO 0 GIT_BRANCH)
 list(GET GIT_INFO 1 GIT_COMMIT_HASH_SHORT)
 list(GET GIT_INFO 2 GIT_COMMIT_HASH)
 list(GET GIT_INFO 3 GIT_COMMIT_TIMESTAMP)
-
-# Extract Dirty state
-string(FIND ${GIT_COMMIT_HASH} "-dirty" GIT_DIRTY)
-if(GIT_DIRTY EQUAL -1)
-   unset(GIT_DIRTY)
-else()
-   set(GIT_DIRTY 1)
-endif()
+list(GET GIT_INFO 4 GIT_DIRTY)
 
 # Configure header template file
 set(INCLUDE_GAURD_DEF "@INCLUDE_GAURD_DEF@")

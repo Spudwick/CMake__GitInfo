@@ -19,6 +19,6 @@
 
 #cmakedefine GIT_COMMIT_TIMESTAMP @GIT_COMMIT_TIMESTAMP@
 
-#cmakedefine GIT_DIRTY
+#cmakedefine01 GIT_DIRTY
 
 #endif  /* #ifndef @INCLUDE_GAURD_DEF@ ... */

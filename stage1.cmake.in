@@ -8,6 +8,8 @@
 
 # Auto-configured CMake script - don't modify
 
+set(DIRTY_STR "-dirty")
+
 # Get branch
 execute_process(
     COMMAND git branch --show-current
@@ -16,9 +18,9 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-# Get full commit hash with dirty state
+# Get full commit hash
 execute_process(
-    COMMAND git describe --always --dirty --abbrev=0
+    COMMAND git describe --always --dirty=${DIRTY_STR} --abbrev=0
     WORKING_DIRECTORY @WORKSPACE_DIR@
     OUTPUT_VARIABLE GIT_COMMIT_HASH
     OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -40,10 +42,20 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
+# Extract Dirty state
+string(FIND ${GIT_COMMIT_HASH} ${DIRTY_STR} GIT_DIRTY)
+if(GIT_DIRTY EQUAL -1)
+    set(GIT_DIRTY 0)
+else()
+    set(GIT_DIRTY 1)
+    string(REPLACE ${DIRTY_STR} "" GIT_COMMIT_HASH ${GIT_COMMIT_HASH})
+endif()
+
 # Create intermediate Git info file
 file(WRITE @OUTPUT_PATH@
     "${GIT_BRANCH}\n"
     "${GIT_COMMIT_HASH_SHORT}\n"
     "${GIT_COMMIT_HASH}\n"
     "${GIT_COMMIT_TIMESTAMP}\n"
+    "${GIT_DIRTY}\n"
 )
