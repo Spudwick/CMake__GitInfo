@@ -24,6 +24,14 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
+# Get short commit hash
+execute_process(
+    COMMAND git describe --always --abbrev
+    WORKING_DIRECTORY @WORKSPACE_DIR@
+    OUTPUT_VARIABLE GIT_COMMIT_HASH_SHORT
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
 # Get commit UNIX timestamp in UTC
 execute_process(
     COMMAND git show -s --format=%ct
@@ -35,6 +43,7 @@ execute_process(
 # Create intermediate Git info file
 file(WRITE @OUTPUT_PATH@
     "${GIT_BRANCH}\n"
+    "${GIT_COMMIT_HASH_SHORT}\n"
     "${GIT_COMMIT_HASH}\n"
     "${GIT_COMMIT_TIMESTAMP}\n"
 )
